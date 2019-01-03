@@ -3767,7 +3767,7 @@ public:
       Printf(code_wrap->def, ", ");
       if (i != first_class_dmethod)
 	Printf(code_wrap->code, ", ");
-      if (!mono_aot_compatibility_flag)	{
+      if (!mono_aot_compatibility_flag) {
 	Printf(code_wrap->def, "%s::SWIG_Callback%s_t callback%s", dirclassname, methid, methid);
       } else {
 	Printf(code_wrap->def, "%s::SWIG_Callback%s_Dispatcher_t callback%sStatic, ", dirclassname, methid, methid);      
@@ -3778,7 +3778,7 @@ public:
       Printf(code_wrap->code, "callback%s", methid);
       if (!mono_aot_compatibility_flag) {
 	Printf(imclass_class_code, ", %s.SwigDelegate%s_%s delegate%s", qualified_classname, sym_name, methid, methid);
-      } else { 
+      } else {
 	Printf(imclass_class_code, ", %s.SwigDelegate%s_%s_Dispatcher delegate%s_dispatcher", qualified_classname, sym_name, methid, methid);
 	Printf(imclass_class_code, ", global::System.IntPtr delegate%sgcHandlePtr", methid);
       }
