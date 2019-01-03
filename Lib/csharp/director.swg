@@ -47,7 +47,42 @@ namespace Swig {
     }
   };
 
+#if defined(SWIG_DIRECTORS_MONO_AOT_COMPATIBILITY)
   /* Represents a GCHandle to a callback */
   typedef void* GCHandle;
+
+  /* Own a GCHandle and free it automatically */
+  class OwnedGCHandle
+  {
+    public:
+      OwnedGCHandle() : gcHandle(0) {
+      }
+
+      OwnedGCHandle& operator=(GCHandle handle) {
+        gcHandle = handle;
+        return *this;
+      }
+
+      operator GCHandle() {
+        return gcHandle;
+      }
+
+      bool operator!() {
+        return !gcHandle;
+      }
+
+      ~OwnedGCHandle() {
+        if (gcHandle) {
+          SWIG_csharp_gchandle_callback(gcHandle);
+        }
+      }
+
+    private:
+      OwnedGCHandle& operator=(const OwnedGCHandle&);
+      OwnedGCHandle(const OwnedGCHandle&);
+
+      GCHandle gcHandle;
+  };
+#endif
 }
 

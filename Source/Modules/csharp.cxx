@@ -417,6 +417,9 @@ public:
     if (directorsEnabled()) {
       Printf(f_runtime, "#define SWIG_DIRECTORS\n");
 
+      if (mono_aot_compatibility_flag)
+	Printf(f_runtime, "#define SWIG_DIRECTORS_MONO_AOT_COMPATIBILITY\n");
+
       /* Emit initial director header and director code: */
       Swig_banner(f_directors_h);
       Printf(f_directors_h, "\n");
@@ -4357,7 +4360,7 @@ public:
 	Printf(director_callbacks, "    SWIG_Callback%s_t swig_callback%s;\n", methid, overloaded_name);
       } else {
 	Printf(director_callbacks, "    SWIG_Callback%s_Dispatcher_t swig_callback%s_dispatcher;\n", methid, overloaded_name);
-	Printf(director_callbacks, "    Swig::GCHandle swig_callback%s;\n", overloaded_name);
+	Printf(director_callbacks, "    Swig::OwnedGCHandle swig_callback%s;\n", overloaded_name);
 	Printf(director_mono_aot_delegate_definitions, " SwigDelegate%s_%s_Dispatcher(global::System.IntPtr swigDelegate%s_%s_Handle%s%s);\n", classname, methid, classname, methid, ParmList_len(l) > 0 ? ", " : "",delegate_parms);
 	Printf(director_mono_aot_delegate_instances, "  private SwigDelegate%s_%s_Dispatcher swigDelegate%sdispatcher;\n", classname, methid, methid);
       }

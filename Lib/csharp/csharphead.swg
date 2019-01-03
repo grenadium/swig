@@ -456,3 +456,40 @@ SWIGEXPORT void SWIGSTDCALL SWIGRegisterStringCallback_$module(SWIG_CSharpString
 
 #define SWIG_contract_assert(nullreturn, expr, msg) if (!(expr)) {SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentOutOfRangeException, msg, ""); return nullreturn; } else
 %}
+
+#if defined(SWIG_CSHARP_MONO_AOT_COMPATIBILITY)
+%insert(runtime) %{
+/* Callback for freeing GCHandle instances */
+typedef char * (SWIGSTDCALL* SWIG_CSharpGCHandleHelperCallback)(void*);
+static SWIG_CSharpGCHandleHelperCallback SWIG_csharp_gchandle_callback = NULL;
+
+#ifdef __cplusplus
+extern "C"
+#endif
+SWIGEXPORT void SWIGSTDCALL SWIGRegisterGCHandleCallback_$module(SWIG_CSharpGCHandleHelperCallback callback) {
+  SWIG_csharp_gchandle_callback = callback;
+}
+%}
+
+%pragma(csharp) imclasscode=%{
+  protected class SWIGGCHandleHelper {
+    public delegate void SWIGGCHandleDelegate(global::System.IntPtr gcHandlePtr);
+    static SWIGGCHandleDelegate gcHandleDelegate = new SWIGGCHandleDelegate(FreeGCHandle);
+
+    [global::System.Runtime.InteropServices.DllImport("$dllimport", EntryPoint="SWIGRegisterGCHandleCallback_$module")]
+    public static extern void SWIGRegisterGCHandleCallback_$module(SWIGGCHandleDelegate gcHandleDelegate);
+
+    [$imclassname.MonoPInvokeCallback(typeof(SWIGGCHandleDelegate))]
+    static void FreeGCHandle(global::System.IntPtr gcHandlePtr) {
+      global::System.Runtime.InteropServices.GCHandle gcHandle = global::System.Runtime.InteropServices.GCHandle.FromIntPtr(gcHandlePtr);
+      gcHandle.Free();
+    }
+
+    static SWIGGCHandleHelper() {
+      SWIGRegisterGCHandleCallback_$module(gcHandleDelegate);
+    }
+  }
+
+  static protected SWIGGCHandleHelper swigGCHandleHelper = new SWIGGCHandleHelper();
+%}
+#endif
